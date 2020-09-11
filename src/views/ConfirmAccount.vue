@@ -28,7 +28,7 @@ export default {
     },
     methods: {
         confirm() {
-            axios.post('http://localhost:3000/api/user/confirmAccount/', this.form)
+            axios.post('http://songreq.herokuapp.com/api/user/confirmAccount/', this.form)
                 .then(() => {
                     const Toast = Swal.mixin({
                         toast: true,

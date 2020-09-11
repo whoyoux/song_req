@@ -55,7 +55,7 @@ export default {
   },
   beforeCreate() {
     axios
-      .get(`http://localhost:3000/api/user/${this.$route.params.id}`)
+      .get(`http://songreq.herokuapp.com/api/user/${this.$route.params.id}`)
       .then((data) => (this.profile = data.data))
       .catch((err) => console.log(err));
   },
@@ -89,7 +89,7 @@ export default {
         .then((result) => {
           if (result.value) {
             axios
-              .post("api/report", {
+              .post("http://songreq.herokuapp.com/api/report", {
                 userTo: this.$route.params.id,
                 userFrom: VueJwtDecode.decode(localStorage.getItem("jwt"))._id,
                 title: result.value[0],
