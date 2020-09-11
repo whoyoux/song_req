@@ -65,7 +65,7 @@ export default {
     async loginUser() {
       try {
         let response = await axios.post(
-          "http://songreq.herokuapp.com/api/user/login",
+          "https://songreq.herokuapp.com/api/user/login",
           this.form
         );
         let token = response.data.token;

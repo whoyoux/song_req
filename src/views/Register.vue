@@ -121,7 +121,7 @@ export default {
                 return;
             }
             try {
-                let response = await axios.post("http://songreq.herokuapp.com/api/user/register", this.form);
+                let response = await axios.post("https://songreq.herokuapp.com/api/user/register", this.form);
                 let token = response.data.token;
                 if(token) {
                     localStorage.setItem("jwt", token);
