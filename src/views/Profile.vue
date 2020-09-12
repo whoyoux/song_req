@@ -35,7 +35,7 @@
         <h3 style="color: green" v-if="profile.isVerified">Zweryfikowany</h3>
         <h3 style="color: red" v-else>Niezweryfikowany</h3>
         <a href="#">
-          <h5 @click="reportUser">Zgłoś użytkownika</h5>
+          <h6 @click="reportUser">Zgłoś użytkownika</h6>
         </a>
       </b-container>
     </b-container>
@@ -45,6 +45,7 @@
 <script>
 import Swal from "sweetalert2";
 import axios from "axios";
+import {API_STRING} from '../config';
 import VueJwtDecode from "vue-jwt-decode";
 export default {
   name: "Profile",
@@ -55,7 +56,7 @@ export default {
   },
   beforeCreate() {
     axios
-      .get(`https://songreq.herokuapp.com/api/user/${this.$route.params.id}`)
+      .get(`${API_STRING}/api/user/${this.$route.params.nickname}`)
       .then((data) => (this.profile = data.data))
       .catch((err) => console.log(err));
   },
@@ -89,9 +90,9 @@ export default {
         .then((result) => {
           if (result.value) {
             axios
-              .post("https://songreq.herokuapp.com/api/report", {
-                userTo: this.$route.params.id,
-                userFrom: VueJwtDecode.decode(localStorage.getItem("jwt"))._id,
+              .post(`${API_STRING}/api/report`, {
+                userTo: this.$route.params.nickname,
+                userFrom: VueJwtDecode.decode(localStorage.getItem("jwt")).nickname,
                 title: result.value[0],
                 desc: result.value[1],
               })

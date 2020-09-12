@@ -16,6 +16,7 @@
 <script>
 import Swal from 'sweetalert2';
 import axios from 'axios';
+import {API_STRING} from '../config';
 export default {
     name: 'ConfirmAccount',
     data() {
@@ -28,7 +29,7 @@ export default {
     },
     methods: {
         confirm() {
-            axios.post('https://songreq.herokuapp.com/api/user/confirmAccount/', this.form)
+            axios.post(`${API_STRING}/api/user/confirmAccount/`, this.form)
                 .then(() => {
                     const Toast = Swal.mixin({
                         toast: true,

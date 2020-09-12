@@ -40,6 +40,7 @@
 import axios from "axios";
 import Swal from "sweetalert2";
 import { mapMutations } from "vuex";
+import {API_STRING} from '../config';
 export default {
   name: "Login",
   data() {
@@ -65,13 +66,14 @@ export default {
     async loginUser() {
       try {
         let response = await axios.post(
-          "https://songreq.herokuapp.com/api/user/login",
+          `${API_STRING}/api/user/login`,
           this.form
         );
         let token = response.data.token;
-        localStorage.setItem("jwt", token);
         if (token) {
+          localStorage.setItem("jwt", token);
           localStorage.setItem("id", response.data.user._id);
+          localStorage.setItem("nickname",response.data.user.nickname)
           await this.setUser(response.data);
 
           const Toast = Swal.mixin({

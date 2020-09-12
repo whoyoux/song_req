@@ -18,7 +18,7 @@
           </template>
           <b-dropdown-item to="/">Dodaj piosenke</b-dropdown-item>
           <b-dropdown-item to="/dashboard">Panel sterowania</b-dropdown-item>
-          <b-dropdown-item :to="`/profile/${id}`">Profil</b-dropdown-item>
+          <b-dropdown-item :to="`/profile/${nickname}`">Profil</b-dropdown-item>
           <b-dropdown-item href="#" variant="danger" @click="logOutUser">Wyloguj się</b-dropdown-item>
         </b-nav-item-dropdown>
         <b-nav-item-dropdown right v-else>
@@ -48,8 +48,8 @@ export default {
   },
   computed: {
     ...mapState(["isLogged"]),
-    id: () => {
-      return localStorage.getItem('id');
+    nickname: () => {
+      return localStorage.getItem('nickname');
     }
   },
   methods: {
@@ -57,6 +57,7 @@ export default {
     logOutUser() {
       localStorage.removeItem("jwt");
       localStorage.removeItem("id");
+      localStorage.removeItem("nickname");
       this.setLogged(false);
       const Toast = Swal.mixin({
         toast: true,

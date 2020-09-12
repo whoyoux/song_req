@@ -32,7 +32,7 @@ Vue.use(VueRouter)
     component: () => import('../views/Register.vue')
   },
   {
-    path: '/profile/:id',
+    path: '/profile/:nickname',
     component: () => import('../views/Profile.vue')
   },
   {

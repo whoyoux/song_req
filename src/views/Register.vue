@@ -1,8 +1,9 @@
 <template>
   <b-container fluid>
-    <b-container v-if="show">
+    <b-container>
         <h1>Rejestracja</h1>
-        <b-form @submit.prevent="registerUser">
+        <b-spinner label="Loading..." v-if="!show"></b-spinner>
+        <b-form @submit.prevent="registerUser" v-else>
             <h4 style="color: red" v-if="error">{{error}}</h4>
             
             <b-form-group
@@ -88,6 +89,7 @@
 <script>
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import {API_STRING} from '../config';
 import {mapMutations} from 'vuex';
 export default {
     name: 'Register',
@@ -121,10 +123,13 @@ export default {
                 return;
             }
             try {
-                let response = await axios.post("https://songreq.herokuapp.com/api/user/register", this.form);
+                this.show = false;
+                let response = await axios.post(`${API_STRING}/api/user/register`, this.form);
                 let token = response.data.token;
                 if(token) {
                     localStorage.setItem("jwt", token);
+                    localStorage.setItem("id", response.data.data._id);
+                    localStorage.setItem("nickname", response.data.data.nickname);
                     this.$router.push("/").catch(()=>{});
                     // Swal.fire Udane logowanie!
                     // mozna tez uzyc vue notify czy cos takiego
@@ -166,7 +171,7 @@ export default {
                     console.log('Nieudana rejestracja!');
                 }
             } catch(err) {
-                console.log('Error! ' + err);
+                //console.log(err.response.status);
                 const Toast = Swal.mixin({
                         toast: true,
                         position: "top-end",
@@ -178,11 +183,39 @@ export default {
                             toast.addEventListener("mouseleave", Swal.resumeTimer);
                             },
                     });
+                this.show = true;
+                console.log('Error! ' + err);
+                switch (err.response.status) {
+                    case 400:
+                        Toast.fire({
+                            icon: "error",
+                            title: "Nieznany błąd! Skontaktuj się z administratorem! Sprawdź logi!"
+                        });
+                        break;
+                    case 401:
+                        Toast.fire({
+                            icon: "error",
+                            title: "Ta nazwa jest już zajęta!"
+                        });
+                        break;
+                    case 409:
+                        Toast.fire({
+                            icon: "error",
+                            title: "Ten email jest juz zajęty!"
+                        });
+                        break;
+                    default:
+                        Toast.fire({
+                            icon: "error",
+                            title: "Nieznany błąd! Skontaktuj się z administratorem! Sprawdź logi!"
+                        });
+                        console.log(`Wystąpił nieznany error! Proszę zgłosić się do administratora!`);
+                        console.log(`Błąd: ${err}`);
+                        break;
+                }
+                
 
-                    Toast.fire({
-                        icon: "error",
-                        title: "Ten email jest juz zajęty!"
-                    });
+                    
                 
             }
         },

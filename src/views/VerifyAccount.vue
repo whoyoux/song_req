@@ -10,6 +10,7 @@
 
 <script>
 import {mapState} from 'vuex';
+import {API_STRING} from '../config';
 import axios from 'axios';
 export default {
     name: 'VerifyAccount',
@@ -35,7 +36,7 @@ export default {
                             Authorization: `Bearer ${localStorage.getItem('jwt')}`
                         }
                     }
-                    let response = await axios.post('https://songreq.herokuapp.com/api/user/verify', {id: localStorage.getItem('id'), verify_code: this.verify_code}, axios_config);
+                    let response = await axios.post(`${API_STRING}/api/user/verify`, {id: localStorage.getItem('id'), verify_code: this.verify_code}, axios_config);
                     this.$router.push('/dashboard');
                     console.log(response.data);
                     
