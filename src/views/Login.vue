@@ -2,7 +2,8 @@
   <b-container fluid>
     <b-container v-if="!logged">
       <h1>Login</h1>
-      <b-form @submit.prevent="loginUser">
+      <b-spinner label="Loading..." v-if="!show"></b-spinner>
+      <b-form @submit.prevent="loginUser" v-else>
         <!--<h4 style="color: red" v-if="error">{{error}}</h4> -->
 
         <b-form-group
@@ -49,6 +50,7 @@ export default {
         email: "",
         password: "",
       },
+      show: true,
       error: "",
       logged: false,
     };
@@ -65,6 +67,7 @@ export default {
     ...mapMutations(["setUser", "setLogged"]),
     async loginUser() {
       try {
+        this.show = false;
         let response = await axios.post(
           `${API_STRING}/api/user/login`,
           this.form
@@ -93,11 +96,13 @@ export default {
             icon: "success",
             title: "Logowanie udane",
           });
+          this.show = true;
           this.setLogged(true);
           this.$router.push("/dashboard").catch(()=>{});
         }
       } catch (err) {
         console.log("Error! " + err);
+        this.show = true;
         this.error = "Błędne dane do logowania!";
         const Toast = Swal.mixin({
           toast: true,
