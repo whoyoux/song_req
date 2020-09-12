@@ -71,6 +71,7 @@ export default {
         );
         let token = response.data.token;
         if (token) {
+          console.log(response.data.user.nickname);
           localStorage.setItem("jwt", token);
           localStorage.setItem("id", response.data.user._id);
           localStorage.setItem("nickname",response.data.user.nickname)
