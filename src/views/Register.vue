@@ -131,10 +131,6 @@ export default {
                     localStorage.setItem("id", response.data.data._id);
                     localStorage.setItem("nickname", response.data.data.nickname);
                     this.$router.push("/").catch(()=>{});
-                    // Swal.fire Udane logowanie!
-                    // mozna tez uzyc vue notify czy cos takiego
-                    //console.log('Udana rejestracja!');
-                    //this.setUser(response.data);
                     const Toast = Swal.mixin({
                         toast: true,
                         position: "top-end",

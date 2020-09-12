@@ -7,7 +7,7 @@
             type="email"
             required
             placeholder="np. jan@kowalski.pl"
-            class="w-50"
+            class="w-50 mx-auto mb-3"
         ></b-form-input>
         <b-button variant="success" @click="confirm()">Potwierdź konto!</b-button>
   </b-container>
@@ -49,7 +49,7 @@ export default {
                     });
                     this.$router.push("/");
                 })
-                .catch(() => {
+                .catch((err) => {
                     const Toast = Swal.mixin({
                         toast: true,
                         position: "top-end",
@@ -62,10 +62,36 @@ export default {
                         },
                     });
 
-                    Toast.fire({
-                        icon: "success",
-                        title: "To konto zostało już potwierdzone!",
-                    });
+                    switch (err.response.status) {
+                        case 500:
+                            Toast.fire({
+                                icon: "warning",
+                                title: "To konto zostało już potwierdzone!",
+                            });
+                            break;
+                        case 501:
+                            Toast.fire({
+                                icon: "warning",
+                                title: "Podany email jest błędny do tokenu! Proszę podać poprawny!",
+                            });
+                            break;
+                        case 504:
+                            Toast.fire({
+                                icon: "warning",
+                                title: "Ten token już wygasł!",
+                            });
+                            break;
+                        default:
+                            Toast.fire({
+                                icon: "error",
+                                title: "Wystąpił błąd! Skontaktuj się z administratorem!",
+                            });
+                            console.log('BŁĄD Z WERYFIKACJĄ KONTA!');
+                            console.log(`Błąd: ${err}`);
+                            break;
+                    }
+
+                    
                 });
         }
     }
