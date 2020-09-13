@@ -4,6 +4,8 @@
       <b-container v-if="profile.message">
         <h3 style="color:red">{{profile.message}}</h3>
       </b-container>
+      <b-spinner label="Loading..." class="mt-5" v-if="!show"></b-spinner>
+      <div v-else>
       <b-badge v-if="profile.role === 'Admin' && !profile.message" variant="danger">Admin</b-badge>
       <b-container
         v-if="!profile.message"
@@ -38,6 +40,7 @@
           <h6 @click="reportUser">Zgłoś użytkownika</h6>
         </a>
       </b-container>
+      </div>
     </b-container>
   </b-container>
 </template>
@@ -52,13 +55,36 @@ export default {
   data() {
     return {
       profile: {},
+      show: false,
     };
   },
   beforeCreate() {
     axios
       .get(`${API_STRING}/api/user/${this.$route.params.nickname}`)
-      .then((data) => (this.profile = data.data))
-      .catch((err) => console.log(err));
+      .then((data) => {
+        this.profile = data.data;
+        this.show=true;
+      })
+      .catch((err) => {
+         const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 5000,
+            timerProgressBar: true,
+            onOpen: (toast) => {
+              toast.addEventListener("mouseenter", Swal.stopTimer);
+              toast.addEventListener("mouseleave", Swal.resumeTimer);
+            },
+          });
+
+          Toast.fire({
+            icon: "error",
+            title: "Wystąpił nieznany błąd! Skontaktuj się z administratorem!",
+          });
+          console.log(err);
+          this.$router.push("/dashboard").catch(()=>{});
+      });
   },
   methods: {
     async reportUser() {
