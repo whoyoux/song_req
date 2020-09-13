@@ -4,7 +4,7 @@
     <b-container fluid>
       <h3 v-if="!isLogged" style="color:red">Trzeba się zalogować, aby móc dodać piosenkę!</h3>
       <b-spinner label="Loading..." class="mt-5" v-if="!show_song_add"></b-spinner>
-      <b-form class="pb-5" v-else @submit="addSongToList">
+      <div class="pb-5" v-else>
       <b-form-group
         id="fieldset-1"
         description="Akceptujemy tylko linki z youtube'a."
@@ -15,15 +15,27 @@
         
           </b-form-input>
         </b-form-group>
+        
+      <vue-recaptcha 
+        sitekey="6Lf2uMsZAAAAANl2t_y3byQZU87Uz9eGsjxYaCzu"
+        ref="recaptcha"
+        @verify="onVerify"
+        @expired="onExpired"
+        class="g-recaptcha"
+      ></vue-recaptcha>
+      <br />
         <b-button type="submit" variant="success" @click="addSongToList" :disabled=!isLogged>Dodaj do listy!</b-button>
-      </b-form>
+      </div>
       <b-spinner label="Loading..." class="mt-5" v-if="!show_song_list"></b-spinner>
+      <h4 v-if="songs.length == 0 && show_song_list">Nie ma narazie żadnych piosenek na liście</h4>
       <div v-else>
         <b-card
           v-for="song in songs" v-bind:key="song._id"
           :title="`${song.videoTitle}`"
           :img-src="`${song.thumbnailUrl}`"
           img-alt="Image"
+          img-height="275"
+          img-width="300"
           img-top
           tag="article"
           class="mx-auto w-auto mb-4 card"
@@ -46,29 +58,45 @@
 
 <script>
 import axios from 'axios';
-import {API_STRING} from '../config';
 import Swal from 'sweetalert2';
+import {API_STRING} from '../config';
 import {mapState} from 'vuex';
+import VueRecaptcha from 'vue-recaptcha';
 export default {
     name: 'Home',
     computed: {
     ...mapState(["isLogged", "user"]),
+    },
+    components: {
+      VueRecaptcha
     },
     data() {
       return {
         yt_link: "",
         songs: [],
         show_song_list: false,
-        show_song_add: true
+        show_song_add: true,
+        isCaptcha: false,
+        captchaToken: ''
       }
     },
     async mounted() {
       this.fetchVideos();
     },
     methods: {
-      yt_link_submit(e) {
-        e.preventDefault();
-        console.log(this.yt_link);
+      onVerify: function (response) {
+        this.isCaptcha = true;
+        this.captchaToken = response;
+      },
+      onExpired: function () {
+        this.resetRecaptcha();
+        this.isCaptcha = false;
+        this.captchaToken = '';
+      },
+      resetRecaptcha() {
+        this.$refs.recaptcha.reset();
+        this.isCaptcha = false;
+        this.captchaToken = '';
       },
       async fetchVideos() {
         try {
@@ -114,6 +142,15 @@ export default {
           return;
         } 
 
+        if(!this.isCaptcha) {
+          this.show_song_add = true;
+          Swal.fire({
+            icon: 'error',
+            title: 'Problem!',
+            text: 'Proszę zaakceptować captche!',
+          });
+          return;
+        }
       
         try {
           const config = {
@@ -121,7 +158,8 @@ export default {
           };
           await axios.post(`${API_STRING}/api/song/add`, {
             link: this.yt_link,
-            author_id: this.user.id
+            author_id: this.user.id,
+            captchaToken: this.captchaToken
           }, config);
           this.fetchVideos();
           this.show_song_add = true;
@@ -133,11 +171,54 @@ export default {
           this.yt_link = "";
         } catch(err) {
           this.show_song_add = true;
-          Swal.fire({
-            icon: 'error',
-            title: 'Błąd!',
-            text: 'Nie udalo się dodać piosenki! Zgłoś problem do administratora!',
-          })
+          this.yt_link = "";
+          this.isCaptcha = false;
+          this.captchaToken = '';
+          switch (err.response.status) {
+            case 400:
+              Swal.fire({
+                icon: 'error',
+                title: 'Błąd!',
+                text: 'Proszę podać poprawny link!',
+              });
+              break;
+            case 401:
+              Swal.fire({
+                icon: 'error',
+                title: 'Błąd!',
+                text: 'Proszę zaakceptować captche!',
+              });
+              break;
+            case 405:
+              Swal.fire({
+                icon: 'error',
+                title: 'Błąd!',
+                text: 'Aby dodać do listy piosenkę, musisz mieć zweryfikowane konto!',
+              });
+              break;
+            case 500:
+              Swal.fire({
+                icon: 'error',
+                title: 'Błąd!',
+                text: 'Nie udało się dodać piosenki do listy!',
+              });
+              break;
+            case 501:
+              Swal.fire({
+                icon: 'error',
+                title: 'Błąd!',
+                text: 'Błąd captchy! Skontaktuj się z admistratorem, jeżeli pojawia się to dość często!',
+              });
+              break;
+            default:
+              Swal.fire({
+                icon: 'error',
+                title: 'Błąd!',
+                text: 'Nie udalo się dodać piosenki! Zgłoś problem do administratora!',
+              });
+              console.log(`Błąd: ${err}`);
+              break;
+                    }
         }
       }
     }
@@ -152,9 +233,13 @@ export default {
   border: 1px solid var(--success);
 }
 
+.g-recaptcha {
+  display: inline-block;
+}
+
 @media screen and (min-width: 1000px) {
   .card {
-    max-width: 50vw;
+    max-width: 30vw;
   }
 }
 </style>
