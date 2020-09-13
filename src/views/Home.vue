@@ -8,10 +8,14 @@
       <b-form-group
         id="fieldset-1"
         description="Akceptujemy tylko linki z youtube'a."
-        label="Link do piosenki"
-        label-for="input-1"
+        class="mt-4"
       >
-          <b-form-input id="input-1" v-model="yt_link" class="w-50 mx-auto" trim>
+          <b-form-input id="input-1" 
+            v-model="yt_link" 
+            class="w-50 mx-auto" 
+            trim
+            placeholder="Link do piosenki"
+          >
         
           </b-form-input>
         </b-form-group>

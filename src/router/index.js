@@ -40,6 +40,13 @@ Vue.use(VueRouter)
     component: () => import('../views/ConfirmAccount.vue'),
   },
   {
+    path: '/admin',
+    meta: {
+      requiresAuth: true,
+    },
+    component: () => import('../views/AdminPanel.vue')
+  },
+  {
     path: '/*',
     component: () => import('../views/404.vue')
   }
