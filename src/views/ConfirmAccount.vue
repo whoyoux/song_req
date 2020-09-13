@@ -1,15 +1,18 @@
 <template>
   <b-container fluid>
         <h1>Potwiedzanie konta</h1>
-        <b-form-input
-            id="input-email"
-            v-model="form.email"
-            type="email"
-            required
-            placeholder="np. jan@kowalski.pl"
-            class="w-50 mx-auto mb-3"
-        ></b-form-input>
-        <b-button variant="success" @click="confirm()">Potwierdź konto!</b-button>
+        <b-spinner label="Loading..." v-if="!show"></b-spinner>
+        <div v-else>
+            <b-form-input
+                id="input-email"
+                v-model="form.email"
+                type="email"
+                required
+                placeholder="np. jan@kowalski.pl"
+                class="w-50 mx-auto mb-3"
+            ></b-form-input>
+            <b-button variant="success" @click="confirm()">Potwierdź konto!</b-button>
+        </div>
   </b-container>
 </template>
 
@@ -25,10 +28,12 @@ export default {
                 email: '',
                 confirmToken: this.$route.params.confirmToken
             },
+            show: true,
         }
     },
     methods: {
         confirm() {
+            this.show=false;
             axios.post(`${API_STRING}/api/user/confirmAccount/`, this.form)
                 .then(() => {
                     const Toast = Swal.mixin({
@@ -47,9 +52,11 @@ export default {
                         icon: "success",
                         title: "Udało się konto potwierdzić!",
                     });
+                    this.show=true;
                     this.$router.push("/");
                 })
                 .catch((err) => {
+                    this.show=true;
                     const Toast = Swal.mixin({
                         toast: true,
                         position: "top-end",

@@ -13,7 +13,8 @@
           <!-- Using 'button-content' slot -->
           <template v-slot:button-content>
             <em>
-              <b-icon icon="person" class="mr-2"></b-icon>
+              {{user.nickname}}
+              <b-icon icon="person"></b-icon>
             </em>
           </template>
           <b-dropdown-item to="/">Dodaj piosenke</b-dropdown-item>

@@ -69,7 +69,6 @@ export default {
         );
         let token = response.data.token;
         if (token) {
-          console.log(response);
           await this.setLogged(true);
           await this.setUser(response.data.user);
 

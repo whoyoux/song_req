@@ -127,7 +127,6 @@ export default {
                 let response = await axios.post(`${API_STRING}/api/user/register`, this.form);
                 let token = response.data.token;
                 if(token) {
-                    console.log(response);
                     localStorage.setItem("jwt", token);
                     await this.setLogged(true);
                     await this.setUser(response.data.data);
