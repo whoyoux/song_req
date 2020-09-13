@@ -18,7 +18,7 @@
           </template>
           <b-dropdown-item to="/">Dodaj piosenke</b-dropdown-item>
           <b-dropdown-item to="/dashboard">Panel sterowania</b-dropdown-item>
-          <b-dropdown-item :to="`/profile/${nickname}`">Profil</b-dropdown-item>
+          <b-dropdown-item :to="`/profile/${user.nickname}`">Profil</b-dropdown-item>
           <b-dropdown-item href="#" variant="danger" @click="logOutUser">Wyloguj się</b-dropdown-item>
         </b-nav-item-dropdown>
         <b-nav-item-dropdown right v-else>
@@ -41,23 +41,14 @@ import VueJwtDecode from "vue-jwt-decode";
 import { mapMutations, mapState } from "vuex";
 export default {
   name: "App",
-  data() {
-    return {
-      user: ""
-    };
-  },
   computed: {
-    ...mapState(["isLogged"]),
-    nickname: () => {
-      return localStorage.getItem('nickname');
-    }
+    ...mapState(["isLogged", "user"]),
   },
   methods: {
-    ...mapMutations(["setLogged"]),
+    ...mapMutations(["setLogged", "setUser", "resetUser"]),
     logOutUser() {
+      this.resetUser();
       localStorage.removeItem("jwt");
-      localStorage.removeItem("id");
-      localStorage.removeItem("nickname");
       this.setLogged(false);
       const Toast = Swal.mixin({
         toast: true,
@@ -82,7 +73,7 @@ export default {
     if (localStorage.getItem("jwt")) {
       let token = localStorage.getItem("jwt");
       let decoded = VueJwtDecode.decode(token);
-      this.user = decoded;
+      this.setUser(decoded);
       this.setLogged(true);
     } else {
       this.setLogged(false);

@@ -116,7 +116,7 @@ export default {
         this.error = '';
     },
     methods: {
-        ...mapMutations(['setUser']),
+        ...mapMutations(["setUser", "setLogged"]),
         async registerUser() {
             if(this.accept == false) {
                 this.error = "Proszę zaakceptować regulamin";
@@ -127,9 +127,10 @@ export default {
                 let response = await axios.post(`${API_STRING}/api/user/register`, this.form);
                 let token = response.data.token;
                 if(token) {
+                    console.log(response);
                     localStorage.setItem("jwt", token);
-                    localStorage.setItem("id", response.data.data._id);
-                    localStorage.setItem("nickname", response.data.data.nickname);
+                    await this.setLogged(true);
+                    await this.setUser(response.data.data);
                     this.$router.push("/").catch(()=>{});
                     const Toast = Swal.mixin({
                         toast: true,

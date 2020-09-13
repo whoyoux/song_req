@@ -1,6 +1,6 @@
 <template>
   <b-container fluid>
-    <b-container v-if="!logged">
+    <b-container>
       <h1>Login</h1>
       <b-spinner label="Loading..." v-if="!show"></b-spinner>
       <b-form @submit.prevent="loginUser" v-else>
@@ -57,11 +57,6 @@ export default {
   },
   created() {
     this.error = "";
-    if (localStorage.getItem("jwt")) {
-      this.logged = true;
-    } else {
-      this.logged = false;
-    }
   },
   methods: {
     ...mapMutations(["setUser", "setLogged"]),
@@ -74,11 +69,12 @@ export default {
         );
         let token = response.data.token;
         if (token) {
-          localStorage.setItem("jwt", token);
-          localStorage.setItem("id", response.data.user._id);
-          localStorage.setItem("nickname",response.data.user.nickname)
-          await this.setUser(response.data);
+          console.log(response);
+          await this.setLogged(true);
+          await this.setUser(response.data.user);
 
+          localStorage.setItem("jwt", token);
+          
           const Toast = Swal.mixin({
             toast: true,
             position: "top-end",
@@ -96,7 +92,6 @@ export default {
             title: "Logowanie udane",
           });
           this.show = true;
-          this.setLogged(true);
           this.$router.push("/dashboard").catch(()=>{});
         }
       } catch (err) {
