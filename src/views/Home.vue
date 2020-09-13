@@ -3,7 +3,8 @@
     <!--<h3 style="color: var(--warning)">{{this.isLogged ? 'Zalogowany' : 'Nie zalogowany'}}</h3> -->
     <b-container fluid>
       <h3 v-if="!isLogged" style="color:red">Trzeba się zalogować, aby móc dodać piosenkę!</h3>
-      <b-form @submit="yt_link_submit" class="pb-5">
+      <b-spinner label="Loading..." class="mt-5" v-if="!show_song_add"></b-spinner>
+      <b-form class="pb-5" v-else @submit="addSongToList">
       <b-form-group
         id="fieldset-1"
         description="Akceptujemy tylko linki z youtube'a."
@@ -14,7 +15,7 @@
         
           </b-form-input>
         </b-form-group>
-        <b-button type="submit" variant="success" :disabled=!isLogged>Dodaj do listy!</b-button>
+        <b-button type="submit" variant="success" @click="addSongToList" :disabled=!isLogged>Dodaj do listy!</b-button>
       </b-form>
       <b-spinner label="Loading..." class="mt-5" v-if="!show_song_list"></b-spinner>
       <div v-else>
@@ -46,34 +47,98 @@
 <script>
 import axios from 'axios';
 import {API_STRING} from '../config';
+import Swal from 'sweetalert2';
 import {mapState} from 'vuex';
 export default {
     name: 'Home',
     computed: {
-    ...mapState(["isLogged"]),
+    ...mapState(["isLogged", "user"]),
     },
     data() {
       return {
         yt_link: "",
         songs: [],
         show_song_list: false,
+        show_song_add: true
       }
     },
     async mounted() {
-      try {
-        console.log('Starting get info!');
-        let response = await axios.get(`${API_STRING}/api/song/list`);
-        this.songs = response.data;
-        console.log(this.songs);
-        this.show_song_list = true;
-      } catch(err) {
-        console.log(err);
-      }
+      this.fetchVideos();
     },
     methods: {
       yt_link_submit(e) {
         e.preventDefault();
         console.log(this.yt_link);
+      },
+      async fetchVideos() {
+        try {
+          let response = await axios.get(`${API_STRING}/api/song/list`);
+          this.songs = response.data;
+          this.show_song_list = true;
+        } catch(err) {
+          console.log(err);
+        }
+      },
+      async addSongToList(e) {
+        e.preventDefault();
+        this.show_song_add = false;
+
+        if(!localStorage.getItem('jwt')) {
+          this.show_song_add = true;
+          Swal.fire({
+            icon: 'error',
+            title: 'Problem z kontem!',
+            text: 'Proszę się wylogować i zalogować ponownie!',
+          });
+          return;
+        }
+
+        const yt_regex = /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w-]+\?v=|embed\/|v\/)?)([\w-]+)(\S+)?$/;
+        if(!yt_regex.test(this.yt_link)) {
+          this.show_song_add = true;
+          Swal.fire({
+            icon: 'error',
+            title: 'Problem!',
+            text: 'Podaj prawidłowy link do filmu!',
+          });
+          return;
+        }
+
+        if(this.yt_link.trim() === "") {
+          this.show_song_add = true;
+          Swal.fire({
+            icon: 'error',
+            title: 'Problem!',
+            text: 'Pole linku nie może być puste!',
+          });
+          return;
+        } 
+
+      
+        try {
+          const config = {
+            headers: { Authorization: `Bearer ${localStorage.getItem('jwt')}` }
+          };
+          await axios.post(`${API_STRING}/api/song/add`, {
+            link: this.yt_link,
+            author_id: this.user.id
+          }, config);
+          this.fetchVideos();
+          this.show_song_add = true;
+          Swal.fire({
+            icon: 'success',
+            title: 'Udało się!',
+            text: 'Twoja piosenka powinna być teraz na końcu listy!'
+          })
+          this.yt_link = "";
+        } catch(err) {
+          this.show_song_add = true;
+          Swal.fire({
+            icon: 'error',
+            title: 'Błąd!',
+            text: 'Nie udalo się dodać piosenki! Zgłoś problem do administratora!',
+          })
+        }
       }
     }
 }
