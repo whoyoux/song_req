@@ -51,12 +51,8 @@
           <p>Dodane przez: <b>{{song.author_nickname}}</b></p>
         </b-card-text>
         <b-button :href="`${song.link}`" target="_blank" variant="success">Przejdz do filmiku</b-button>
-        <div v-if="isUserAdmin" class="mt-2">
-          <b-button @click="confirmSong(song._id)" :disabled="song.isConfirmed" variant="success" class="mr-2">Akceptuj</b-button>
-          <b-button @click="deleteSong(song._id)" variant="danger">Odrzuć</b-button>
-        </div>
-        <div v-if="isUserAdmin && song.isConfirmed">
-          <h5 style="color: var(--success)" class="mt-4">Przyjęte!</h5>
+        <div class="mt-2" v-if="isUserAdmin">
+          <b-button @click="deleteSongFromList(song._id)" variant="danger">Wyrzuć z listy</b-button>
         </div>
         <!-- <div v-else-if="isUserAdmin">
           <h5 style="color: var(--danger)" class="mt-4">Wystąpił błąd! Jeżeli się da to należy odrzucić!</h5>
@@ -101,6 +97,27 @@ export default {
       this.fetchVideos();
     },
     methods: {
+      async deleteSongFromList(id) {
+        Swal.fire({
+          title: 'Jesteś pewny?',
+          text: "Nie będziesz mógł tego przywrócić!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Tak!',
+          cancelButtonText: "Nie!"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              this.deleteSong(id)
+              Swal.fire(
+              'Usunięte!',
+              'Ta piosenka została wyrzucona z listy!',
+              'success'
+              )
+            }
+          })
+      },
       onVerify: function (response) {
         this.isCaptcha = true;
         this.captchaToken = response;
@@ -117,7 +134,7 @@ export default {
       },
       async fetchVideos() {
         try {
-          let response = await axios.get(`${API_STRING}/api/song/list`);
+          let response = await axios.get(`${API_STRING}/api/song/confirmed_list`);
           this.songs = response.data;
           this.show_song_list = true;
         } catch(err) {
@@ -209,7 +226,7 @@ export default {
           Swal.fire({
             icon: 'success',
             title: 'Udało się!',
-            text: 'Twoja piosenka powinna być teraz na końcu listy!'
+            text: 'Twoja piosenka jest na liście do zatwierdzenia!'
           })
           this.yt_link = "";
         } catch(err) {
