@@ -91,7 +91,7 @@ export default {
             title: "Logowanie udane",
           });
           this.show = true;
-          this.$router.push("/dashboard").catch(()=>{});
+          this.$router.push("/").catch(()=>{});
         }
       } catch (err) {
         console.log("Error! " + err);

@@ -50,8 +50,17 @@
           <p>Numer w kolejce: <b>{{song.queue_number}}</b></p>
           <p>Dodane przez: <b>{{song.author_nickname}}</b></p>
         </b-card-text>
-
         <b-button :href="`${song.link}`" target="_blank" variant="success">Przejdz do filmiku</b-button>
+        <div v-if="isUserAdmin" class="mt-2">
+          <b-button @click="confirmSong(song._id)" :disabled="song.isConfirmed" variant="success" class="mr-2">Akceptuj</b-button>
+          <b-button @click="deleteSong(song._id)" variant="danger">Odrzuć</b-button>
+        </div>
+        <div v-if="isUserAdmin && song.isConfirmed">
+          <h5 style="color: var(--success)" class="mt-4">Przyjęte!</h5>
+        </div>
+        <!-- <div v-else-if="isUserAdmin">
+          <h5 style="color: var(--danger)" class="mt-4">Wystąpił błąd! Jeżeli się da to należy odrzucić!</h5>
+        </div> -->
       </b-card>
       </div>
       
@@ -70,6 +79,10 @@ export default {
     name: 'Home',
     computed: {
     ...mapState(["isLogged", "user"]),
+      isUserAdmin() {
+        if(this.user.role == 'Admin') return true;
+        else return false;
+      },
     },
     components: {
       VueRecaptcha
@@ -107,6 +120,32 @@ export default {
           let response = await axios.get(`${API_STRING}/api/song/list`);
           this.songs = response.data;
           this.show_song_list = true;
+        } catch(err) {
+          console.log(err);
+        }
+      },
+      async confirmSong(id) {
+        try {
+          const config = {
+            headers: { Authorization: `Bearer ${localStorage.getItem('jwt')}` }
+          };
+          await axios.post(`${API_STRING}/api/song/accept`, {
+            "song_id": id
+          },config);
+          this.fetchVideos();
+        } catch(err) {
+          console.log(err);
+        }
+      },
+      async deleteSong(id) {
+        try{
+          const config = {
+            headers: { Authorization: `Bearer ${localStorage.getItem('jwt')}` }
+          };
+          await axios.post(`${API_STRING}/api/song/delete`, {
+            "song_id": id
+          },config);
+          this.fetchVideos();
         } catch(err) {
           console.log(err);
         }
