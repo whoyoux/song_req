@@ -1,6 +1,6 @@
 <template>
   <div>
-      <h1>Admin panel</h1>
+      <h1 class="mt-2">Admin Panel</h1>
       <h3 v-if="songs.length == 0">Nie ma narazie nic do zatwierdzenia :)</h3>
       <b-card
           v-for="song in songs" v-bind:key="song._id"

@@ -1,13 +1,14 @@
 <template>
   <div id="app">
     <b-navbar toggleable="lg" type="dark" variant="success">
-    <b-navbar-brand to="/">kopernik song request</b-navbar-brand>
+    <b-navbar-brand to="/">Radio Kopernik</b-navbar-brand>
 
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
-        <b-nav-item to="/admin" v-if="user.role === 'Admin'">Admin panel</b-nav-item>
+        <b-nav-item to="/admin_panel" v-if="user.role === 'Admin'">Admin Panel</b-nav-item>
+        <b-nav-item to="/admin_player" v-if="user.role === 'Admin'">Admin Player</b-nav-item>
       </b-navbar-nav>
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
@@ -21,8 +22,10 @@
             </em>
           </template>
           <b-dropdown-item to="/">Dodaj piosenke</b-dropdown-item>
-          <b-dropdown-item to="/dashboard">Panel sterowania</b-dropdown-item>
+          <!-- <b-dropdown-item to="/dashboard">Panel sterowania</b-dropdown-item> -->
           <b-dropdown-item :to="`/profile/${user.nickname}`">Profil</b-dropdown-item>
+          <b-dropdown-item to="/admin_panel" v-if="user.role === 'Admin'">Panel</b-dropdown-item>
+          <b-dropdown-item to="/admin_player" v-if="user.role === 'Admin'">Player</b-dropdown-item>
           <b-dropdown-item href="#" variant="danger" @click="logOutUser">Wyloguj się</b-dropdown-item>
         </b-nav-item-dropdown>
         <b-nav-item-dropdown right v-else>

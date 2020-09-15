@@ -6,22 +6,22 @@
       </b-container>
       <b-spinner label="Loading..." class="mt-5" v-if="!show"></b-spinner>
       <div v-else>
-      <b-badge v-if="profile.role === 'Admin' && !profile.message" variant="danger">Admin</b-badge>
+      <b-badge v-if="profile.role === 'Admin' && !profile.message" variant="danger" class="mt-3">Admin</b-badge>
       <b-container
         v-if="!profile.message"
         id="profile"
-        :class="profile.role === 'Admin' ? 'admin_border' : 'member_border'"
+        :class="profile.role === 'Admin' ? 'admin_border' : 'member_border mt-3'"
       >
         <b-row>
-          <b-col md="4" sm="12">
+          <b-col md="12" sm="12">
             <b-avatar size="4rem"></b-avatar>
           </b-col>
-          <b-col md="4" sm="12">
+          <b-col md="12" sm="12">
             <h3><b>{{profile.nickname}}</b></h3>
           </b-col>
-          <b-col md="4" sm="12"></b-col>
+          <b-col md="12" sm="12"></b-col>
         </b-row>
-        <div>
+        <!-- <div>
           <h4>Ocena:</h4>
           <b-form-rating
             id="rating-10"
@@ -32,10 +32,16 @@
             color="#ff8800"
             class="w-50 mx-auto"
           ></b-form-rating>
-        </div>
+        </div> -->
         <h3>{{profile.city}}</h3>
         <h3 style="color: green" v-if="profile.isVerified">Zweryfikowany</h3>
-        <h3 style="color: red" v-else>Niezweryfikowany</h3>
+        <div v-else>
+          <h3 style="color: red">Niezweryfikowany</h3>
+          <a href="#" v-if="isSameUser">
+            <h6 @click="resendVerifyEmail">Wyślij email weryfikacyjny jeszcze raz</h6>
+          </a>
+        </div>
+        
         <a href="#">
           <h6 @click="reportUser">Zgłoś użytkownika</h6>
         </a>
@@ -57,6 +63,14 @@ export default {
       profile: {},
       show: false,
     };
+  },
+  computed: {
+    isSameUser() {
+      if(localStorage.getItem('jwt')) {
+        if(VueJwtDecode.decode(localStorage.getItem('jwt')).nickname === this.$route.params.nickname) return true;
+        else return false;
+      } else return false;
+    }
   },
   beforeCreate() {
     axios
@@ -139,6 +153,39 @@ export default {
           }
         });
     },
+    async resendVerifyEmail() {
+      Swal.fire({
+        title: 'Jesteś tego pewny?',
+        text: "Chcesz wysłać jeszcze raz email weryfikacyjny?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Tak!',
+        cancelButtonText: "Nie"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          axios
+              .post(`${API_STRING}/api/user/resendVerifyToken`, {
+                email: VueJwtDecode.decode(localStorage.getItem("jwt")).email
+              })
+              .then(() => {
+                Swal.fire({
+                  icon: "success",
+                  title: "Wysłane!",
+                  text: "Sprawdź wszystkie foldery!",
+                });
+              })
+              .catch(() => {
+                Swal.fire({
+                  icon: "error",
+                  title: "Nieudało się!",
+                  text: "Coś poszło źle! Prosze spróbować ponownie poźniej!",
+                });
+              });
+  }
+})
+    }
   },
 };
 </script>

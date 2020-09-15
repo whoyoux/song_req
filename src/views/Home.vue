@@ -47,7 +47,7 @@
         >
         <b-card-text>
           <p>Autor: <b>{{song.videoAuthor}}</b></p>
-          <p>Numer w kolejce: <b>{{song.queue_number}}</b></p>
+          <!-- <p>Numer w kolejce: <b>{{song.queue_number}}</b></p> -->
           <p>Dodane przez: <b>{{song.author_nickname}}</b></p>
         </b-card-text>
         <b-button :href="`${song.link}`" target="_blank" variant="success">Przejdz do filmiku</b-button>
