@@ -44,14 +44,21 @@ Vue.use(VueRouter)
     meta: {
       requiresAuth: true,
     },
-    component: () => import('../views/AdminPanel.vue')
+    component: () => import('../views/admin/AdminPanel.vue')
   },
   {
     path: '/admin_player',
     meta: {
       requiresAuth: true,
     },
-    component: () => import('../views/AdminPlayer.vue')
+    component: () => import('../views/admin/AdminPlayer.vue')
+  },
+  {
+    path: '/admin_user_panel',
+    meta: {
+      requiresAuth: true,
+    },
+    component: () => import('../views/admin/AdminUserPanel.vue')
   },
   {
     path: '/*',

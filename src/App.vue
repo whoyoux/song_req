@@ -1,14 +1,15 @@
 <template>
   <div id="app">
     <b-navbar toggleable="lg" type="dark" variant="success">
-    <b-navbar-brand to="/">Radio Kopernik</b-navbar-brand>
+    <b-navbar-brand to="/">Radio</b-navbar-brand>
 
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
     <b-collapse id="nav-collapse" is-nav>
-      <b-navbar-nav>
-        <b-nav-item to="/admin_panel" v-if="user.role === 'Admin'">Admin Panel</b-nav-item>
-        <b-nav-item to="/admin_player" v-if="user.role === 'Admin'">Admin Player</b-nav-item>
+      <b-navbar-nav v-if="user.role === 'Admin'">
+        <b-nav-item to="/admin_panel">Admin Panel</b-nav-item>
+        <b-nav-item to="/admin_player">Admin Player</b-nav-item>
+        <b-nav-item to="/admin_user_panel">Admin User Panel</b-nav-item>
       </b-navbar-nav>
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">

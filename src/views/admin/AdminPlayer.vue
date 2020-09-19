@@ -19,6 +19,10 @@
             allowfullscreen
         >
         </iframe>
+        <div v-if="songs[videoCouter+1] != undefined || songs[videoCouter+1] != null">
+          <p>Następne: <b>{{songs[videoCouter+1].videoTitle}}</b> by <b>{{songs[videoCouter+1].videoAuthor}}</b></p>
+        </div>
+        
         <br />
             <b-button @click="setNextVideo" variant="warning">Przejdź do następnej</b-button>
       </div>
@@ -27,7 +31,7 @@
 
 <script>
 import axios from 'axios';
-import {API_STRING} from '../config';
+import {API_STRING} from '../../config';
 export default {
     name: 'AdminPlayer',
     data() {

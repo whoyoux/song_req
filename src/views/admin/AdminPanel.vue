@@ -2,38 +2,14 @@
   <div>
       <h1 class="mt-2">Admin Panel</h1>
       <h3 v-if="songs.length == 0">Nie ma narazie nic do zatwierdzenia :)</h3>
-      <b-card
-          v-for="song in songs" v-bind:key="song._id"
-          :title="`${song.videoTitle}`"
-          :img-src="`${song.thumbnailUrl}`"
-          img-alt="Image"
-          img-height="275"
-          img-width="300"
-          img-top
-          tag="article"
-          class="mx-auto w-auto mb-4 card"
-          :class="song.isConfirmed === true ? 'confirmed' : 'notConfirmed'"
-        >
-        <b-card-text>
-          <p>Autor: <b>{{song.videoAuthor}}</b></p>
-          <p>Numer w kolejce: <b>{{song.queue_number}}</b></p>
-          <p>Dodane przez: <b>{{song.author_nickname}}</b></p>
-        </b-card-text>
-        <b-button :href="`${song.link}`" target="_blank" variant="success">Przejdz do filmiku</b-button>
-        <div class="mt-2">
-          <b-button @click="confirmSong(song._id)" variant="success" class="mr-2">Akceptuj</b-button>
-          <b-button @click="deleteSong(song._id)" variant="danger">Odrzuć</b-button>
-        </div>
-        <!-- <div v-else-if="isUserAdmin">
-          <h5 style="color: var(--danger)" class="mt-4">Wystąpił błąd! Jeżeli się da to należy odrzucić!</h5>
-        </div> -->
-      </b-card>
+      <SongCard v-for="song in songs" v-bind:key="song._id" :song="song" :isAdminPanel="true" />
   </div>
 </template>
 
 <script>
 import axios from 'axios';
-import {API_STRING} from '../config';
+import {API_STRING} from '../../config';
+import SongCard from '@/components/SongCard.vue';
 export default {
     name: 'AdminPanel',
     data() {
@@ -41,6 +17,9 @@ export default {
             songs: [],
             show_song_list: false,
         }
+    },
+    components: {
+      SongCard
     },
     async mounted() {
         if(this.$store.state.user.role !== 'Admin') {

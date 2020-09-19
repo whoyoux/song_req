@@ -33,31 +33,7 @@
       <b-spinner label="Loading..." class="mt-5" v-if="!show_song_list"></b-spinner>
       <h4 v-if="songs.length == 0 && show_song_list">Nie ma narazie żadnych piosenek na liście</h4>
       <div v-else>
-        <b-card
-          v-for="song in songs" v-bind:key="song._id"
-          :title="`${song.videoTitle}`"
-          :img-src="`${song.thumbnailUrl}`"
-          img-alt="Image"
-          img-height="275"
-          img-width="300"
-          img-top
-          tag="article"
-          class="mx-auto w-auto mb-4 card"
-          :class="song.isConfirmed === true ? 'confirmed' : 'notConfirmed'"
-        >
-        <b-card-text>
-          <p>Autor: <b>{{song.videoAuthor}}</b></p>
-          <!-- <p>Numer w kolejce: <b>{{song.queue_number}}</b></p> -->
-          <p>Dodane przez: <b>{{song.author_nickname}}</b></p>
-        </b-card-text>
-        <b-button :href="`${song.link}`" target="_blank" variant="success">Przejdz do filmiku</b-button>
-        <div class="mt-2" v-if="isUserAdmin">
-          <b-button @click="deleteSongFromList(song._id)" variant="danger">Wyrzuć z listy</b-button>
-        </div>
-        <!-- <div v-else-if="isUserAdmin">
-          <h5 style="color: var(--danger)" class="mt-4">Wystąpił błąd! Jeżeli się da to należy odrzucić!</h5>
-        </div> -->
-      </b-card>
+        <SongCard v-for="song in songs" v-bind:key="song._id" :song="song" :isAdminPanel="false"/>
       </div>
       
     </b-container>
@@ -71,6 +47,7 @@ import Swal from 'sweetalert2';
 import {API_STRING} from '../config';
 import {mapState} from 'vuex';
 import VueRecaptcha from 'vue-recaptcha';
+import SongCard from '@/components/SongCard.vue';
 export default {
     name: 'Home',
     computed: {
@@ -81,7 +58,8 @@ export default {
       },
     },
     components: {
-      VueRecaptcha
+      VueRecaptcha,
+      SongCard
     },
     data() {
       return {
