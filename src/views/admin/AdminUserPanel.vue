@@ -1,6 +1,6 @@
 <template>
   <div>
-      <h3>Admin User Panel</h3>
+      <h3 class="mt-2">Admin User Panel</h3>
       <b-spinner label="Loading..." class="mt-5" v-if="!showUsersList"></b-spinner>
       <div v-else>
           <AdminUserCard v-for="user in users" v-bind:key="user._id" :user="user"/>
